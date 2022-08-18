@@ -1,0 +1,113 @@
+<%- include('layout.ejs'); %>
+    <div class="row justify-content-center" style="margin-bottom: 20px; margin-top: 20px;">
+        <h2>Requests</h2>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">ID</th>
+            <th scope="col">Image</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%if(items) {
+            items.forEach((el,i) => {
+        %>
+            <tr>
+                <th scope="row"> <%= i + 1%></th>
+                <td><%= el._id%></td>
+                <td><img style="width: 100px; height: 100px;" src=" data:image/jpeg;charset=utf-8;base64,<%= el.image%>" /></td>
+                <td>
+                    <a data-imageID="<%=el._id%>" data-id="<%=el.requestUserId%>"  class="btn btn-success" role="button">
+                        Approve
+                    </a>
+                    <a data-imageID="<%=el._id%>" data-id="<%=el.requestUserId%>" class="btn btn-danger" role="button">
+                        Decline
+                    </a>
+                </td>
+            </tr>
+        <%
+            })
+        } else {
+        %>
+        <div>
+            No users is created
+        </div>
+        <%
+        }
+        %>
+        </tbody>
+    </table>
+</div>
+<script>
+    var approveButtons = document.querySelectorAll('.btn-success');
+    approveButtons.forEach(async el => {
+        await el.addEventListener('click', async (e) => {
+            const reqUserId = el.dataset.id;
+            const imageID = el.dataset.imageid
+            const response = await fetch(`/api/users/${reqUserId}/items/${imageID}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getCookie("token")}`
+              },
+              mode: 'cors',
+              body: JSON.stringify({
+                usersId: reqUserId,
+                requestStatus: "not_requested",
+                requestUserId: null
+              })
+            });
+            if(response.status === 204){
+              return await response.json();
+            } else {
+              let error;
+              try{
+                error = await response.json();
+              } catch(e){
+                error = {
+                  status: response.status,
+                  message: response.statusText
+                }
+              }
+              return new Error(JSON.stringify(error))
+          }
+        })
+    });
+
+    var declineButtons = document.querySelectorAll('.btn-danger');
+    declineButtons.forEach(async el => {
+        await el.addEventListener('click', async (e) => {
+            const reqUserId = el.dataset.id;
+            const imageID = el.dataset.imageid
+            const response = await fetch(`/api/users/${reqUserId}/items/${imageID}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              mode: 'cors',
+              body: JSON.stringify({
+                requestStatus: "not_requested",
+                requestUserId: null
+              })
+            });
+            if(response.status === 204){
+              return await response.json();
+            } else {
+              let error;
+              try{
+                error = await response.json();
+              } catch(e){
+                error = {
+                  status: response.status,
+                  message: response.statusText
+                }
+              }
+              return new Error(JSON.stringify(error))
+          }
+        })
+    })
+</script>
+<%- include('footer.ejs'); %>

@@ -1,0 +1,46 @@
+<%- include('layout.ejs'); %>
+<div class="container" style="margin-top: 20px; margin-bottom: 20px;">
+    <%items.forEach((el) => { %>
+        <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="data:image/jpeg;charset=utf-8;base64,<%= el.image%>" />
+            <a data-imageid="<%=el._id%>" data-id="<%=el.usersId%>" href="#" class="btn btn-primary">Request</a>
+      </div>
+      <% }) %>
+</div>
+<script>
+    var requestButtons = document.querySelectorAll('.btn-primary');
+    requestButtons.forEach(async el => {
+        await el.addEventListener('click', async (e) => {
+            const userID = el.dataset.id;
+            const imageID = el.dataset.imageid
+            const response = await fetch(`/api/users/${userID}/items/${imageID}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getCookie("token")}`
+              },
+              mode: 'cors',
+              body: JSON.stringify({
+                usersId: userID,
+                requestStatus: "requested",
+                requestUserId: getCookie("id")
+              })
+            });
+            if(response.status === 204){
+              return await response.json();
+            } else {
+              let error;
+              try{
+                error = await response.json();
+              } catch(e){
+                error = {
+                  status: response.status,
+                  message: response.statusText
+                }
+              }
+              return new Error(JSON.stringify(error))
+          }
+        })
+    });
+</script>
+<%- include('footer.ejs'); %>

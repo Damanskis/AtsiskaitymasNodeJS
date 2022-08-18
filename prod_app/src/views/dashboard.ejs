@@ -1,0 +1,43 @@
+<%- include('layout.ejs'); %>
+<div class="container">
+    <div class="row justify-content-center" style="margin-bottom: 20px; margin-top: 20px;">
+        <h2 style="margin-right: 20px;">Dashboard</h2>
+        <a class="btn btn-primary request-btn" href="#" role="button">Requests</a>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%if(users) {
+            users.forEach((el,i) => {
+        %>
+        <tr>
+            <th scope="row"> <%= i + 1%></th>
+            <td><%= el._id%></td>
+            <td><%= el.username%></td>
+            <td>
+                <a class="btn btn-primary" href="/users/<%=el._id%>" role="button">
+                    View items
+                </a>
+            </td>
+        </tr>
+        <%
+            })
+        } else {
+        %>
+        <div>
+            No users is created
+        </div>
+        <%
+        }
+        %>
+        </tbody>
+    </table>
+</div>
+<%- include('footer.ejs'); %>

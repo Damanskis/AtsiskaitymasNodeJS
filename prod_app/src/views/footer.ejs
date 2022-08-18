@@ -1,0 +1,39 @@
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+    var delete_cookie = function(name) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    };
+    let userID;
+    if(window.location.search) {
+        const search = window.location.search.split("&")
+        userID = search[1].substr(3, search[1].length);
+        if(search[0].includes("token")) {
+            setCookie("token", window.location.search.substr(7,search[0].length), 365);
+            setCookie("id", search[1].substr(3, search[1].length))
+            document.location.href = "/"
+        }
+    } else if(getCookie("id") && getCookie("token")) {
+        userID = getCookie("id");
+        if (document.querySelector('.request-btn')) {
+            document.querySelector('.request-btn').href = `/users/${userID}/requests`;
+        }
+    } else {
+        document.location.href = "/login"
+    }
+    
+</script>
+</body>
+</html>
